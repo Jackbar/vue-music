@@ -5,6 +5,8 @@
 </template>
 
 <script>
+  import {getSingerDetail} from 'api/singer'
+  import {ERR_OK} from 'api/config'
   import {mapGetters} from 'vuex'
 
   export default {
@@ -13,8 +15,23 @@
         'singer'
       ])
     },
+    methods: {
+      _getDetail() {
+        if (!this.singer.id) {
+          this.$router.push({
+            'path': '/singer'
+          })
+          return
+        }
+        getSingerDetail(this.singer.id).then(res => {
+          if (res.code === ERR_OK) {
+            console.log(res.data.list)
+          }
+        })
+      }
+    },
     created() {
-      console.log(this.singer)
+      this._getDetail()
     }
   }
 </script>
