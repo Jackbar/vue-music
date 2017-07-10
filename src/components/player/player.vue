@@ -27,6 +27,13 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :precent="precent" @percentChange="percentChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -64,7 +71,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="timeupdate"></audio>
   </div>
 </template>
 
@@ -72,12 +79,17 @@
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
+  import progressBar from 'base/progress-bar/progress-bar'
 
   const transform = prefixStyle('transform')
   export default {
+    components: {
+      progressBar
+    },
     data() {
       return {
-        songReady: false
+        songReady: false,
+        currentTime: 0
       }
     },
     computed: {
@@ -92,6 +104,9 @@
       },
       disableClass() {
         return this.songReady ? '' : 'disable'
+      },
+      precent() {
+        return this.currentTime / this.currentSong.duration
       },
       ...mapGetters([
         'fullScreen', 'playList', 'currentSong', 'playing', 'currentIndex'
@@ -154,6 +169,15 @@
       error() {
         this.songReady = true
       },
+      timeupdate(e) {
+        this.currentTime = e.target.currentTime
+      },
+      percentChange(precent) {
+        this.$refs.audio.currentTime = precent * this.currentSong.duration
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+      },
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
         let animation = {
@@ -192,6 +216,20 @@
       afterLeave() {
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
+      },
+      format(i) {
+        let time = i | 0
+        let min = time / 60 | 0
+        let sec = this._pad(time % 60)
+        return `${min}:${sec}`
+      },
+      _pad(i, n = 2) {
+        let length = i.toString().length
+        while (length < n) {
+          i = '0' + i
+          length++
+        }
+        return i
       },
       _getPosAndScale() {
         const targetWidth = 40
