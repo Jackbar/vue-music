@@ -20,16 +20,16 @@
   const progressBtnWidth = 16
   export default {
     props: {
-      precent: {
+      percent: {
         type: Number,
         default: 0
       }
     },
     watch: {
-      precent(newPrecent) {
-        if (newPrecent >= 0 && !this.touch.init) {
+      percent(newPercent) {
+        if (newPercent >= 0 && !this.touch.init) {
           let progressBarWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
-          let offset = newPrecent * progressBarWidth
+          let offset = newPercent * progressBarWidth
           this._offset(offset)
         }
       }
@@ -58,8 +58,8 @@
       },
       _triggerPercent() {
         let progressBarWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
-        let precent = this.$refs.progress.clientWidth
-        this.$emit('percentChange', precent / progressBarWidth)
+        let percent = this.$refs.progress.clientWidth
+        this.$emit('percentChange', percent / progressBarWidth)
       },
       _offset(offset) {
         this.$refs.progress.style.width = offset + 'px'

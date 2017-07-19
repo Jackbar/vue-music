@@ -30,7 +30,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :precent="precent" @percentChange="percentChange"></progress-bar>
+              <progress-bar :percent="percent" @percentChange="percentChange"></progress-bar>
             </div>
             <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
@@ -64,7 +64,9 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIconPlay"></i>
+          <progress-circle :radius="32" :percent="percent">
+            <i class="icon-mini" @click.stop="togglePlaying" :class="miniIconPlay"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -80,11 +82,12 @@
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import progressBar from 'base/progress-bar/progress-bar'
+  import progressCircle from 'base/progress-circle'
 
   const transform = prefixStyle('transform')
   export default {
     components: {
-      progressBar
+      progressBar, progressCircle
     },
     data() {
       return {
@@ -105,7 +108,7 @@
       disableClass() {
         return this.songReady ? '' : 'disable'
       },
-      precent() {
+      percent() {
         return this.currentTime / this.currentSong.duration
       },
       ...mapGetters([
@@ -172,8 +175,8 @@
       timeupdate(e) {
         this.currentTime = e.target.currentTime
       },
-      percentChange(precent) {
-        this.$refs.audio.currentTime = precent * this.currentSong.duration
+      percentChange(percent) {
+        this.$refs.audio.currentTime = percent * this.currentSong.duration
         if (!this.playing) {
           this.togglePlaying()
         }
